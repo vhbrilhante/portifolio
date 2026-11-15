@@ -10,6 +10,12 @@ npm run dev      # http://localhost:5173
 npm run build    # gera dist/
 ```
 
+## Preview online (GitHub Pages)
+
+Todo push na `main` publica o site em https://vhbrilhante.github.io/portifolio/
+pelo workflow `.github/workflows/deploy-pages.yml`. Uma vez só: em
+**Settings → Pages → Build and deployment → Source**, escolha **GitHub Actions**.
+
 ## Estrutura
 
 ```
