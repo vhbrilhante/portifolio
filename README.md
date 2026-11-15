@@ -24,7 +24,13 @@ src/lib/utils.ts                # cn() = clsx + tailwind-merge (padrão shadcn)
 src/components/ui/
   inline-mark.tsx               # palavra + logo / foto na mesma linha (regra da altura da fonte)
   interactive-folder-gallery.tsx# pasta de projetos em glassmorphism (framer-motion)
-src/App.tsx                     # página (layout do Figma)
+src/App.tsx                     # página (layout do Figma) + rota #/resume
+src/content.tsx                 # TEXTOS, LINKS, PROJETOS E CARREIRA: edite aqui
+src/pages/Resume.tsx            # aba de currículo (Print / PDF pelo navegador)
+src/components/ui/career-timeline.tsx  # linha do tempo 2025 → 2028 (gurbinder.dev)
+src/components/ui/toolbar.tsx   # copiar link, som, tema, relógio local (ch.sh)
+src/components/ui/text-fx.tsx   # marca-texto, pílula, letra à mão, forte/fraco (antwi.dev)
+src/lib/sfx.ts                  # efeitos sonoros sintetizados (Web Audio)
 public/assets/                  # logos e fotos exportados do Figma
 ```
 
