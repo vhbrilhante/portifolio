@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react"
-import { Check } from "lucide-react"
+import { CheckIcon, CopyIcon } from "@phosphor-icons/react"
 import { InlineMark, PhotoMark } from "@/components/ui/inline-mark"
 import { InteractiveFolderGallery, type GalleryPhoto } from "@/components/ui/interactive-folder-gallery"
 
@@ -37,7 +37,7 @@ function ScaledStage({ size = 684, children }: { size?: number; children: ReactN
     return () => ro.disconnect()
   }, [size])
   return (
-    <div ref={ref} className="relative aspect-square w-full max-w-[684px] bg-panel">
+    <div ref={ref} className="relative aspect-square w-full max-w-[684px] overflow-hidden rounded-[28px] bg-panel">
       <div className="absolute left-0 top-0 origin-top-left" style={{ width: size, height: size, transform: `scale(${scale})` }}>
         {children}
       </div>
@@ -56,9 +56,9 @@ function CopyEmail() {
         setCopied(true)
         setTimeout(() => setCopied(false), 1400)
       }}
-      className="ml-[0.22em] mr-[0.18em] inline-block h-[1cap] w-[1cap] align-baseline text-black/70 hover:text-black"
+      className="ml-[0.25em] mr-[0.15em] inline-block size-[1em] align-[-0.15em] cursor-pointer text-black/60 transition-colors hover:text-black"
     >
-      {copied ? <Check className="size-full" strokeWidth={2.5} /> : <img src={asset("copy.svg")} alt="" className="block size-full" />}
+      {copied ? <CheckIcon className="block size-full" weight="bold" /> : <CopyIcon className="block size-full" />}
     </button>
   )
 }
@@ -71,7 +71,7 @@ export default function App() {
       <div className="mx-auto grid max-w-[1255px] grid-cols-1 gap-x-[84px] min-[1180px]:grid-cols-[487px_684px]">
         {/* topo: logo + menu */}
         <header className="col-span-full grid grid-cols-subgrid items-start">
-          <a href="#" aria-label="Home" className="mt-1 block h-[37px] w-[43px] rotate-180">
+          <a href="#" aria-label="Home" className="mt-1 block h-[37px] w-[43px]">
             <img src={asset("vh-logo.svg")} alt="vh" width={43} height={37} />
           </a>
           <nav className="hidden min-[1180px]:flex gap-[46px] text-[24px] leading-[34px]">

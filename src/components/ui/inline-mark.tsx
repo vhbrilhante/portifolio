@@ -3,12 +3,13 @@ import { cn } from "@/lib/utils"
 
 /**
  * Regra das marcas inline (logo ou foto à direita da palavra):
- * - altura = altura da letra maiúscula da fonte (unidade CSS `cap`), nunca maior;
- * - apoiada na linha de base, então fica na mesma linha do texto;
- * - tudo em `em`/`cap`: se o tamanho ou a fonte mudar, a marca acompanha.
+ * - altura = tamanho da fonte (1em), nunca maior;
+ * - centralizada nas letras da linha (desce 0.15em abaixo da base), então fica
+ *   na mesma linha do texto sem empurrar o espaçamento entre linhas;
+ * - tudo em `em`: se o tamanho ou a fonte mudar, a marca acompanha.
  */
 const markBox =
-  "inline-block h-[0.72em] h-[1cap] align-baseline ml-[0.22em] shrink-0"
+  "inline-block h-[1em] align-[-0.15em] ml-[0.25em] shrink-0"
 
 interface InlineMarkProps {
   children: ReactNode
@@ -80,11 +81,11 @@ export function PhotoMark({ thumb, full, alt, width = 240, className }: PhotoMar
       onKeyDown={(e) => e.key === "Escape" && setOpen(false)}
       data-open={open}
       className={cn(
-        "group relative inline-block aspect-square h-[0.72em] h-[1cap] align-baseline ml-[0.22em] cursor-zoom-in outline-none",
+        "group relative inline-block aspect-square h-[1em] align-[-0.15em] ml-[0.25em] cursor-zoom-in outline-none",
         className,
       )}
     >
-      <img src={thumb} alt="" className="block size-full rounded-[3px] object-cover" draggable={false} />
+      <img src={thumb} alt="" className="block size-full rounded-[0.18em] object-cover" draggable={false} />
       <img
         src={full}
         alt={alt}
