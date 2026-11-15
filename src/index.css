@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Liter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Hina Mincho", ui-serif, Georgia, serif;
+  --color-ink: #000000;
+  --color-paper: #ffffff;
+  --color-panel: #f5f5f7;
+}
+
+@layer base {
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    @apply bg-paper text-ink font-sans antialiased;
+  }
+}

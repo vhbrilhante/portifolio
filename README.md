@@ -1,1 +1,42 @@
-# portif-lio
+# Portfólio — Victor Hugo Brilhante (protótipo)
+
+React + TypeScript + Tailwind CSS v4 + Vite, com a estrutura do shadcn/ui.
+
+## Rodar
+
+```bash
+npm install
+npm run dev      # http://localhost:5173
+npm run build    # gera dist/
+```
+
+## Estrutura
+
+```
+components.json                 # config do shadcn (aliases @/components, @/components/ui, @/lib/utils)
+src/lib/utils.ts                # cn() = clsx + tailwind-merge (padrão shadcn)
+src/components/ui/
+  inline-mark.tsx               # palavra + logo / foto na mesma linha (regra da altura da fonte)
+  interactive-folder-gallery.tsx# pasta de projetos em glassmorphism (framer-motion)
+src/App.tsx                     # página (layout do Figma)
+public/assets/                  # logos e fotos exportados do Figma
+```
+
+### Por que `src/components/ui`
+É o caminho padrão do shadcn. Quando você roda `npx shadcn@latest add <componente>`
+(ou cola um componente do 21st.dev), ele espera os componentes em `@/components/ui`
+e o helper `cn` em `@/lib/utils`. Mantendo essa pasta, todo componente novo entra
+sem precisar ajustar import.
+
+### Se fosse começar do zero
+```bash
+npm create vite@latest portfolio -- --template react-ts
+npm install tailwindcss @tailwindcss/vite
+npx shadcn@latest init        # cria components.json, lib/utils e o alias @
+npm install framer-motion lucide-react
+```
+
+## Regra das marcas inline
+Logo ou foto à direita da palavra tem altura `1cap` (altura da letra maiúscula da
+fonte) e fica na linha de base. Assim nunca passa da altura do texto e acompanha
+qualquer mudança de fonte ou tamanho.
