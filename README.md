@@ -39,10 +39,13 @@ sem precisar ajustar import.
 npm create vite@latest portfolio -- --template react-ts
 npm install tailwindcss @tailwindcss/vite
 npx shadcn@latest init        # cria components.json, lib/utils e o alias @
-npm install framer-motion lucide-react
+npm install framer-motion @phosphor-icons/react
 ```
 
+## Ícones
+Phosphor Icons (`@phosphor-icons/react`), lista em https://phosphoricons.com
+
 ## Regra das marcas inline
-Logo ou foto à direita da palavra tem altura `1cap` (altura da letra maiúscula da
-fonte) e fica na linha de base. Assim nunca passa da altura do texto e acompanha
-qualquer mudança de fonte ou tamanho.
+Logo ou foto à direita da palavra tem a altura da fonte (`1em`) e fica centralizada
+nas letras da linha (`vertical-align: -0.15em`). Assim nunca passa da altura do texto
+e acompanha qualquer mudança de fonte ou tamanho.
