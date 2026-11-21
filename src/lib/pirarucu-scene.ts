@@ -332,7 +332,7 @@ class Fish {
       const nx = -ty, ny = tx
       const u = 1 - i / NU
       const texX = u * TEX_W
-      // peitorais: zona ~730–870 px da textura
+      // peitorais: zona ~745–850 px da textura, saindo a ~110 px da espinha
       const pec = smooth(720, 760, texX) * (1 - smooth(830, 880, texX))
       for (let j = 0; j <= NV; j++) {
         const v = j / NV
@@ -340,7 +340,7 @@ class Fish {
         let x = C[i].x + nx * vpx * k
         let y = C[i].y + ny * vpx * k
         if (pec > 0) {
-          const f = smooth(80, 190, Math.abs(vpx)) * pec
+          const f = smooth(108, 175, Math.abs(vpx)) * pec
           const side = vpx > 0 ? 0 : 1.9
           const flap = Math.sin(this.finPhase + side) * 26 * k * f
           x += tx * flap
