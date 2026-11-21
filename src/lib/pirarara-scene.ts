@@ -1,21 +1,21 @@
 /*
- * Pirarucu nadando num rio visto de cima (WebGL, sem dependências).
+ * Pirarara nadando num rio visto de cima (WebGL, sem dependências).
  *
  * Como funciona:
- * - A textura é o pirarucu "esticado" (public/assets/pirarucu.webp): a
+ * - A textura é a pirarara "esticado" (public/assets/pirarara.webp): a
  *   ilustração curva foi endireitada ao longo da espinha, com a cabeça
  *   para a direita. Aqui ela vira uma malha (tira de triângulos) que segue
  *   uma espinha animada, então o corpo inteiro dobra e ondula.
  * - A cabeça passeia devagar pela água. O corpo segue o rastro da cabeça
  *   (assim ele faz curvas como peixe de verdade) e, por cima, uma onda
  *   percorre o corpo, mais forte na cauda.
- * - As peitorais remam. De tempos em tempos ele sobe para respirar: fica
+ * - As peitorais remam. De tempos em tempos ela sobe perto da superfície: fica
  *   mais nítido, a sombra se afasta e a cabeça solta uma onda na superfície.
- * - O cursor espanta de leve; clicar faz onda e, perto dele, um susto.
+ * - O cursor espanta de leve; clicar faz onda e, perto dela, um susto.
  * - A água é um shader: cor de rio amazônico, luz (caustics) e ondas.
  */
 
-export interface PirarucuOptions {
+export interface PirararaOptions {
   /** comprimento do peixe em px de layout (padrão: 60% do menor lado) */
   length?: number
   /** URL da textura esticada */
@@ -27,7 +27,7 @@ export interface PirarucuOptions {
 type V = { x: number; y: number }
 
 const TEX_W = 1122 // px da textura original (comprimento do peixe)
-const TEX_H = 454 // altura da textura (espinha no meio)
+const TEX_H = 620 // altura da textura (espinha no meio; alta por causa dos bigodes)
 const NU = 72 // segmentos ao longo do corpo
 const NV = 10 // segmentos na largura
 const MAX_RIPPLES = 12
@@ -210,8 +210,8 @@ class Fish {
     const goalDist = Math.hypot(this.goal.x * W - this.head.x, this.goal.y * H - this.head.y)
     if (goalDist < L * 0.35 || t > this.goalUntil) this.pickGoal(t)
     const toGoal = Math.atan2(this.goal.y * H - this.head.y, this.goal.x * W - this.head.x)
-    const wander = Math.sin(t * 0.37) * 0.12
-    this.turn += (angleDiff(this.angle, toGoal) * 0.45 + wander - this.turn) * dt * 1.2
+    const wander = Math.sin(t * 0.37) * 0.14 + Math.sin(t * 0.13 + 1) * 0.08
+    this.turn += (angleDiff(this.angle, toGoal) * 0.45 + wander - this.turn) * dt * 0.7
     let steer = this.turn
     // borda: só por segurança, se ele encostar demais
     const mx = Math.min(W, H) * 0.12
@@ -254,6 +254,8 @@ class Fish {
       if (x >= 1) { this.breathT = -1; this.depth = 1; this.nextBreath = t + 14 + Math.random() * 8 }
     }
 
+    // impulso a cada batida da cauda
+    target *= 1 + 0.1 * Math.sin(2 * this.phase)
     this.speed += (target - this.speed) * dt * 1.6
     // curva larga: o corpo é grande e não dobra no meio
     const maxTurn = this.startle > 0 ? 1.1 : 0.42
@@ -261,7 +263,7 @@ class Fish {
     this.head.x += Math.cos(this.angle) * this.speed * dt
     this.head.y += Math.sin(this.angle) * this.speed * dt
     // nado: a frequência acompanha a velocidade
-    this.phase += dt * (1.6 + (this.speed / this.base) * 1.9)
+    this.phase += dt * (1.9 + (this.speed / this.base) * 2.1)
     this.finPhase += dt * (2.2 + (this.speed / this.base) * 0.8)
 
     // rastro da cabeça
@@ -310,8 +312,8 @@ class Fish {
   mesh(out: Float32Array, scale: number) {
     const L = this.len * scale
     const k = L / TEX_W // px de layout por px de textura
-    const amp = L * 0.06
-    const lambda = L * 1.05
+    const amp = L * 0.085
+    const lambda = L * 0.95
     // espinha: rastro + onda lateral
     const C: V[] = []
     for (let i = 0; i <= NU; i++) {
@@ -320,8 +322,20 @@ class Fish {
       const q = this.along(s / scale + 3)
       const tx = p.x - q.x, ty = p.y - q.y, tn = Math.hypot(tx, ty) || 1
       const sn = s / L
-      const lat = amp * (0.07 + 0.93 * sn ** 2.2) * Math.sin((2 * Math.PI * s) / lambda - this.phase)
+      // onda principal + um harmônico só na cauda (nado mais fluido)
+      const lat = amp * (
+        (0.05 + 0.95 * sn ** 1.7) * Math.sin((2 * Math.PI * s) / lambda - this.phase) +
+        0.15 * sn ** 3 * Math.sin((4 * Math.PI * s) / lambda - 2 * this.phase + 1)
+      )
       C.push({ x: p.x + (-ty / tn) * lat, y: p.y + (tx / tn) * lat })
+    }
+    // suaviza a espinha (2 passadas de [1,2,1]/4) para não quebrar nas curvas
+    for (let pass = 0; pass < 2; pass++) {
+      const z = C.map((c) => ({ x: c.x, y: c.y }))
+      for (let i = 1; i < NU; i++) {
+        C[i].x = (z[i - 1].x + 2 * z[i].x + z[i + 1].x) / 4
+        C[i].y = (z[i - 1].y + 2 * z[i].y + z[i + 1].y) / 4
+      }
     }
     let o = 0
     for (let i = 0; i <= NU; i++) {
@@ -332,17 +346,18 @@ class Fish {
       const nx = -ty, ny = tx
       const u = 1 - i / NU
       const texX = u * TEX_W
-      // peitorais: zona ~745–850 px da textura, saindo a ~110 px da espinha
-      const pec = smooth(720, 760, texX) * (1 - smooth(830, 880, texX))
+      // nadadeiras: peitorais em x ~680–870 da textura, pélvicas em x ~450–625
+      const pec = smooth(680, 720, texX) * (1 - smooth(830, 870, texX))
+      const pel = smooth(450, 490, texX) * (1 - smooth(585, 625, texX))
       for (let j = 0; j <= NV; j++) {
         const v = j / NV
         const vpx = (v - 0.5) * TEX_H
         let x = C[i].x + nx * vpx * k
         let y = C[i].y + ny * vpx * k
-        if (pec > 0) {
-          const f = smooth(108, 175, Math.abs(vpx)) * pec
-          const side = vpx > 0 ? 0 : 1.9
-          const flap = Math.sin(this.finPhase + side) * 26 * k * f
+        if (pec > 0 || pel > 0) {
+          const f = smooth(135, 250, Math.abs(vpx)) * pec + smooth(70, 150, Math.abs(vpx)) * pel * 0.7
+          const side = (vpx > 0 ? 0 : 1.9) + (pel > 0 ? 1.1 : 0)
+          const flap = Math.sin(this.finPhase + side) * 22 * k * f
           x += tx * flap
           y += ty * flap
         }
@@ -353,7 +368,7 @@ class Fish {
 }
 
 /* --------------------------------------------------------------- cena */
-export function createPirarucuScene(canvas: HTMLCanvasElement, opts: PirarucuOptions = {}) {
+export function createPirararaScene(canvas: HTMLCanvasElement, opts: PirararaOptions = {}) {
   const gl = canvas.getContext("webgl", { premultipliedAlpha: true, alpha: true, antialias: true })
   if (!gl) return null
   const drawWater = opts.water !== false
@@ -399,7 +414,7 @@ export function createPirarucuScene(canvas: HTMLCanvasElement, opts: PirarucuOpt
 
   const img = new Image()
   img.crossOrigin = "anonymous"
-  img.src = opts.texture ?? "assets/pirarucu.webp"
+  img.src = opts.texture ?? "assets/pirarara.webp"
 
   /* textura reduzida para o tamanho de tela: evita o cintilar das escamas */
   function uploadTexture() {
